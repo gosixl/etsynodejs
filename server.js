@@ -50,9 +50,7 @@ app.get('/login', (req, res) => {
 
     const authURL = `${OAUTH_URL}?response_type=code&client_id=${ETSY_CLIENT_ID}&redirect_uri=${encodeURIComponent(ETSY_REDIRECT_URI)}&scope=listings_r&state=randomstring&code_challenge=${codeChallenge}&code_challenge_method=S256`;
 
-    console.log(authURL);
-    open(authURL);
-    res.send('Redirecting to Etsy login...');
+    res.redirect(authURL);
 });
 
 // Step 2: Handle OAuth Callback & Exchange Code for Token
