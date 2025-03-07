@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import crypto from 'crypto';
 import open from 'open';
 import fs from 'fs';
+import { OpenAI } from 'openai';
 
 dotenv.config();
 const app = express();
@@ -103,6 +104,34 @@ app.get('/taxonomy', async (req, res) => {
         res.status(500).send('Failed to fetch taxonomy.');
     }
 });
+
+// Initialize OpenAI client
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// 📌 ChatGPT Endpoint
+app.get('/chatgpt', async (req, res) => {
+    const prompt = req.query.prompt;
+
+    if (!prompt) {
+        return res.status(400).send('Please provide a prompt in the query string.');
+    }
+
+    try {
+        const completion = await openai.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "gpt-3.5-turbo",
+        });
+
+        res.json({ 
+            reply: completion.choices[0].message.content 
+        });
+
+    } catch (error) {
+        console.error('Error calling ChatGPT API:', error.message);
+        res.status(500).send('Failed to fetch response from ChatGPT.');
+    }
+});
+
 
 // Start server and load token on startup
 app.listen(PORT, () => {
